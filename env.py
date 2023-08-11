@@ -1,12 +1,12 @@
 #MSSQL CONNECTION PARAMAETERS
 dwh_server='10.101.5.85'
-dwh_user='app_onyx_dwh_prod'
-dwh_password='poca59100!!'
+dwh_user=''
+dwh_password=''
 dwh_database='onyx_core_prod'
 
 #API PARAMETERS
 api_user="antoine.ducoulombier@alchimiedatasolutions.com"
-api_password="Casagamd58"
+api_password=""
 api_domain="https://onyx-back.azurewebsites.net"
 api_tenantId="14"
 
