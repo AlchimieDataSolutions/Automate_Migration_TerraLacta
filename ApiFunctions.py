@@ -226,3 +226,69 @@ def UpdateFlowColumn(domaine, oFlowId,  newSourceColumnName, newDestinationColum
       except requests.exceptions.RequestException as e:
 
           raise ValueError("An error occurred in GET TOKEN:\n" + str(e))
+
+
+def createProject(domaine,projectName, organizationUnitId,tenantId, token, showConnections=True, showNotifications=False,
+                  showFlows=True,showForms=False,showSchedules=True, showSQLScripts=True, showShellScripts=False,
+                  showFileProviders=False, showVariables=False ,showWorkflows=True, showReports=False, showWidgets=False):
+     url = domaine + "/api/services/app/OProjects/CreateOrEdit"
+
+     payload = json.dumps({
+        "name": projectName,
+        "organizationUnitId": organizationUnitId,
+        "showConnections": showConnections,
+        "showNotifications": showNotifications,
+        "showFlows": showFlows,
+        "showForms": showForms,
+        "showSchedules": showSchedules,
+        "showSQLScripts": showSQLScripts,
+        "showShellScripts": showShellScripts,
+        "showFileProviders": showFileProviders,
+        "showVariables": showVariables,
+        "showWorkflows": showWorkflows,
+        "showReports": showReports,
+        "showWidgets": showWidgets
+      })
+     headers = {
+        'Abp.TenantId': tenantId,
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      }
+
+
+     try:
+        response = requests.request("POST", url, headers=headers, data=payload)
+        projectId=str(response.json()['result'])
+        print(f"Porject '{projectName}' successfully created")
+        return projectId
+
+     except requests.exceptions.RequestException as e:
+
+        raise ValueError("An error occurred in GET TOKEN:\n" + str(e))
+
+
+def createSqlScript(domaine,scriptName,createSqlScriptQuery,projectId,connectionId,tenantId, token):
+    url = domaine + "/api/services/app/OSQLScripts/CreateOrEdit"
+
+    payload = json.dumps({
+        "name": scriptName,
+        "query": createSqlScriptQuery,
+        "commandTimeout": 60,
+        "oProjectId": projectId,
+        "oConnectionId": connectionId
+    })
+    headers = {
+        'Abp.TenantId': tenantId,
+        'Accept': 'text/plain',
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+    }
+    try:
+        response = requests.request("POST", url, headers=headers, data=payload)
+        scriptId = str(response.json()['result'])
+        print(f"Script '{scriptName}' successfully created")
+        return scriptId
+
+    except requests.exceptions.RequestException as e:
+
+        raise ValueError("An error occurred in GET TOKEN:\n" + str(e))

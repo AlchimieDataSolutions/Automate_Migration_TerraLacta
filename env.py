@@ -11,13 +11,14 @@ api_domain="https://onyx-back.azurewebsites.net"
 api_tenantId="14"
 
 # FLUX NEXT
-nomFluxNext = "AD.QN.800 - WILEO SLVA"
-nomObjet = "800_WILEO_SLVA"
 projectId = "6d364624-f0b1-4731-8605-65e5e082e81c"
 destinationConnectionId = "46731818-1b4d-4a8b-a00d-5136a7d18c8f"
 
+#NEOWISE PROJECT
+organisationUnitId='101'
+
 getProject="""
-SELECT TOP 3 t.tbl_lib, CONCAT('STA_',t.tbl_lib_new) as 'nom',
+SELECT t.tbl_lib, CONCAT('STA_',t.tbl_lib_new) as 'nom',
 CASE   WHEN c.cnn_lib = '101L5_DIVSQL2 - MSSQLWILEO' THEN '6f40c6b4-1c59-4601-9211-71b70f0e0513'
 WHEN c.cnn_lib = 'DIVALTO DIFVETO' THEN '80126575-8fea-49c2-af30-2560b83a2b26'
 WHEN c.cnn_lib = 'DIVALTO FAYES' THEN '36800744-3f2f-4cbf-a139-4da397a5a8d7'
@@ -33,8 +34,8 @@ WHEN c.cnn_lib = 'MILK_OFFICE' THEN 'b2f086f2-1155-4a8f-83b3-288bbfabf953'
 WHEN c.cnn_lib = 'MILK_OFFICE LICENCES' THEN 'ef7d5391-a4f8-4514-ad16-562c946dfd0a'
 WHEN c.cnn_lib = 'MILK_OFFICE MAT' THEN '9b1abff3-882e-4de3-877f-0caf2bf1adcb'
 WHEN c.cnn_lib = 'MILK_OFFICE (TL_TEMP)' THEN '96685fee-ad82-4ea7-9335-97a25de8fc57'
-WHEN c.cnn_lib = 'Referentiel produit' THEN '91b38d9a-3494-4b7b-bb3b-737fa8edd6c2'
-WHEN c.cnn_lib = 'Reseau GLAC' THEN 'c67042b4-7464-4e67-b53b-9c7dd8644d6b'
+WHEN c.cnn_lib = 'Référentiel produit' THEN '91b38d9a-3494-4b7b-bb3b-737fa8edd6c2'
+WHEN c.cnn_lib = 'Reseau_GLAC' THEN 'c67042b4-7464-4e67-b53b-9c7dd8644d6b'
 WHEN c.cnn_lib = 'SOLID' THEN '5d313550-2f92-4251-ae4d-171a488a2e00'
 WHEN c.cnn_lib = 'STAMBIA' THEN '82acb0a0-35a3-4dea-8f7d-8d90bc084a9c'
 WHEN c.cnn_lib = 'TERRA_LACTA_DWH' THEN '46731818-1b4d-4a8b-a00d-5136a7d18c8f'
@@ -50,6 +51,7 @@ WHEN c.cnn_lib = 'Weavy - Divalto - Intervention Types' THEN '5d445d2b-0db3-48e5
 WHEN c.cnn_lib = 'Weavy - Divalto - Planning' THEN 'f9e12fce-6c08-492c-a409-016632b91921'
 WHEN c.cnn_lib = 'Weavy - Divalto - Users' THEN 'edb5282c-6c80-4712-85ad-cc31975145fb'
 WHEN c.cnn_lib = 'WILEO SLVA' THEN '73f35d5d-ba39-4f1f-abcc-6772810625b5'
+WHEN c.cnn_lib = 'Financements' THEN 'dc1142ac-06cf-4b2f-9b99-7e40fe672b48'
 END AS cnn_lib_mapping,
 c.cnn_lib
 
@@ -62,7 +64,7 @@ p.[prj_lib] = '{}';
 """
 
 getFlowColumns="""
-	 SELECT top 5
+	 SELECT 
      c.clm_lib
 
     FROM
@@ -76,4 +78,16 @@ getFlowColumns="""
         t.tbl_lib = '{}'
         AND
         cn.cnn_lib='{}'
+"""
+
+getProjectLib="""
+select test.* from (SELECT distinct p.prj_lib,p.prj_post_sql, c.cnt_id
+
+FROM
+[sn_orchestrator].[t_project_prj] p
+JOIN [sn_collect].[t_table_tbl] t ON p.prj_id = t.prj_id
+JOIN [sn_collect].[t_connection_cnn] c on c.cnn_id=t.cnn_id
+where c.cnt_id not in ('21','10','9','8','12')
+)  as test
+order by test.prj_lib
 """
