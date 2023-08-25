@@ -8,8 +8,6 @@ from ApiFunctions import *
 from env import *
 
 i=1
-
-
 #MSSQL CONNEXION
 
 try:
@@ -21,8 +19,6 @@ except:
 
 #GetToken
 token=getToken(api_domain,api_user,api_password,api_tenantId)
-
-
 
 
 #MSSQL QUERY getProjectLib
