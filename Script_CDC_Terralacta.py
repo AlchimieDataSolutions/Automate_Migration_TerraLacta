@@ -1,9 +1,10 @@
+
 import pymssql
 
 class CDCScriptGenerator_MSSQL_Type1:
-    def __init__(self, server, database, username, password):
-        self.conn = pymssql.connect(server, username, password, database)
-        self.cursor = self.conn.cursor()
+    # def __init__(self, server, database, username, password):
+        # self.conn = pymssql.connect(server, username, password, database)
+        # self.cursor = self.conn.cursor()
 
     def generate_insert_query(self, destination, cols, cols_source, colHash, colCreationDate, source, s, destination_alias, d, join_clause, first_key):
         insert_query = f"""
@@ -46,7 +47,7 @@ WHERE
         return delete_query
 
     def close_connection(self):
-        self.conn.close()
+        # self.conn.close()
 
 # usage
 if __name__ == "__main__":
@@ -56,7 +57,8 @@ if __name__ == "__main__":
     password = 'poca59100!!'
     database = 'onyx_core_prod'
 
-    script_generator = CDCScriptGenerator_MSSQL_Type1(server, database, username, password)
+    script_generator = CDCScriptGenerator_MSSQL_Type1()
+        # server, database, username, password)
 
     destination = "[dbo].[nx_BUS_TEST_DVT_WEAVY_interventionequipment]"
     cols = "sn_file_name, sn_file_rownum, srvExport, srvDateUTC, srvAttrib, interventionequipment_ID, intervention_ID, equipment_ID, addedByUser, contract_ID"
