@@ -82,7 +82,7 @@ getFlowColumns="""
 """
 
 getProjectLib="""
-select test.* from (SELECT distinct p.prj_lib,p.prj_post_sql, c.cnt_id
+select data.* from (SELECT distinct p.prj_lib,p.prj_post_sql, c.cnt_id
 
 FROM
 [sn_orchestrator].[t_project_prj] p
@@ -91,4 +91,24 @@ JOIN [sn_collect].[t_connection_cnn] c on c.cnn_id=t.cnn_id
 where c.cnt_id in ('12')
 )  as test
 order by test.prj_lib
+"""
+
+getProjectEmpty="""
+select p.prj_lib, p.prj_post_sql from [sn_orchestrator].[t_project_prj] p where p.prj_lib not in (
+SELECT distinct  p.prj_lib
+FROM
+[sn_orchestrator].[t_project_prj] p
+JOIN [sn_collect].[t_table_tbl] t ON p.prj_id = t.prj_id
+JOIN [sn_collect].[t_connection_cnn] c on c.cnn_id=t.cnn_id)"""
+
+getProjectFile="""
+select data.* from (SELECT distinct p.prj_lib,p.prj_post_sql, c.cnn_lib , c.cnt_id
+
+FROM
+[sn_orchestrator].[t_project_prj] p
+JOIN [sn_collect].[t_table_tbl] t ON p.prj_id = t.prj_id
+JOIN [sn_collect].[t_connection_cnn] c on c.cnn_id=t.cnn_id
+where c.cnt_id  in ('21','10','9')
+)  as data
+
 """
