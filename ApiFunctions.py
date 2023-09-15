@@ -1,33 +1,58 @@
 import json
 import requests
 
-def getToken(domaine,username,pwd,tenantId):
+def getToken(domaine : str, username : str, pwd: str, tenantId : str) -> str:
     """
-    ----------------------------------------------------------------------------------------------------------------------
-    GET TOKEN
-    ----------------------------------------------------------------------------------------------------------------------
+    --------------------------------------------------------------------------------------------------------------------
+    getToken(domaine : str, username : str, pwd: str, tenantId : str) -> requests.models.Response
+
+    Se connecte à l'api pour récupérer un token. Le token est essentiel pour appeler les autres API
+
+    Args :
+        - domaine (str) : exemple ; "https://monAPI.com"
+        - username (str) : nom d'utilisateur pour s'identifier à l'api
+        - pwd (str) : mot de passe pour s'identifier à l'api
+        - tenantId : numéro du tenant sur lequel on souhaite se connecter. Exemple; 2,3,4
+
+    Returns :
+        Response : .text sur l'objet retourné pour récupérer le détail de l'exécution
+    --------------------------------------------------------------------------------------------------------------------
     """
-
-    url = domaine + "/api/TokenAuth/Authenticate"
-
-    payload = json.dumps({
-        "userNameOrEmailAddress": username,
-        "password": pwd
-
-    })
-    headers = {
-        'Abp.TenantId': tenantId,
-        'Accept': 'text/plain',
-        'Content-Type': 'application/json'
-    }
     try:
-        response = requests.request("POST", url, headers=headers, data=payload)
-        token = str(response.json()['result']['accessToken'])
-        print("Accessed bearer token and connexion successfull")
-        return token
-    except requests.exceptions.RequestException as e:
+        # Vérification des types
+        if not isinstance(domaine, str):
+            raise Exception(f"\nErreur type de données  : \n 'Domaine' doit être un 'str', '{type(domaine)}' reçu")
+        if not isinstance(username, str):
+            raise Exception(f"\nErreur type de données  : \n 'username' doit être un 'str', '{type(username)}' reçu")
+        if not isinstance(pwd, str):
+            raise Exception(f"\nErreur type de données  : \n 'pwd' doit être un 'str', '{type(pwd)}' reçu")
+        if not isinstance(tenantId, str):
+            raise Exception(f"\nErreur type de données  : \n 'tenantId' doit être un 'str', '{type(tenantId)}' reçu")
 
-        raise ValueError ("An error occurred in GET TOKEN:\n" + str(e))
+        url = domaine + "/api/TokenAuth/Authenticate"
+
+        payload = json.dumps({
+            "userNameOrEmailAddress": username,
+            "password": pwd
+
+        })
+        headers = {
+            'Abp.TenantId': tenantId,
+            'Accept': 'text/plain',
+            'Content-Type': 'application/json'
+        }
+        response = requests.request("POST", url, headers=headers, data=payload)
+
+        if response.status_code!=200:
+            raise Exception(f"\n Connection failed : \n Statut : {response.status_code} \n Error message : {response.json()['error']['message']} \n Error detail : {response.text}")
+
+        else:
+            print("Accessed bearer token and connexion successfull")
+            token = str(response.json()['result']['accessToken'])
+            return token
+
+    except TypeError as e:
+        print(e)
 
 
 def createWorkflow(domaine,nomObjet,projectId,tenantId,token,isScheduled=False,emailSentOnError=False,enableCrossProject=False):

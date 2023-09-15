@@ -1,21 +1,22 @@
 #MSSQL CONNECTION PARAMAETERS
 dwh_server='10.101.5.85'
-dwh_user=''
-dwh_password=''
+dwh_user='app_onyx_dwh_prod'
+dwh_password='poca59100!!'
 dwh_database='onyx_core_prod'
 
 #API PARAMETERS
-api_user="antoine.ducoulombier@alchimiedatasolutions.com"
-api_password=""
+api_user="kasi.gajavalli@alchimiedatasolutions.com"
+api_password="6nEbNvmmTbLZR9U"
 api_domain="https://onyx-back.azurewebsites.net"
 api_tenantId="14"
 
 # FLUX NEXT
-projectId = "6d364624-f0b1-4731-8605-65e5e082e81c"
+projectId = "e9485cee-f3f9-4520-9c43-e70bcd3ede83"
 destinationConnectionId = "46731818-1b4d-4a8b-a00d-5136a7d18c8f"
 
 #NEOWISE PROJECT
 organisationUnitId='101'
+
 
 getProject="""
 SELECT t.tbl_lib, CONCAT('STA_',t.tbl_lib_new) as 'nom',
@@ -41,8 +42,8 @@ WHEN c.cnn_lib = 'STAMBIA' THEN '82acb0a0-35a3-4dea-8f7d-8d90bc084a9c'
 WHEN c.cnn_lib = 'TERRA_LACTA_DWH' THEN '46731818-1b4d-4a8b-a00d-5136a7d18c8f'
 WHEN c.cnn_lib = 'Weavy - Divalto - Customers' THEN '24ad2644-fcad-4d4f-b0cd-6508fffdd9cc'
 WHEN c.cnn_lib = 'Weavy - Divalto - Equipment Address' THEN '828e788e-7457-4d75-93c0-1aab8fb93602'
-WHEN c.cnn_lib = 'Weavy - Divalto - Equipments' THEN '9864d7fa-db14-49f6-9485-deb6807c17f2'
-WHEN c.cnn_lib = 'Weavy - Divalto - Intervention Parts Details' THEN 'bca14a35-f3b2-436f-a703-d51b27f773c0'
+WHEN c.cnn_lib = 'Weavy - Divalto -  Equipments' THEN '9864d7fa-db14-49f6-9485-deb6807c17f2'
+WHEN c.cnn_lib = 'Weavy - Divalto -  Intervention Parts Details' THEN 'bca14a35-f3b2-436f-a703-d51b27f773c0'
 WHEN c.cnn_lib = 'Weavy - Divalto - Interventions' THEN 'bc544eda-10ab-4bb3-a806-53f3435cff7c'
 WHEN c.cnn_lib = 'Weavy - Divalto - Interventions Equipments' THEN 'ed6421c0-f463-4e95-b9b2-1d4fcf636c83'
 WHEN c.cnn_lib = 'Weavy - Divalto - Interventions History Headers' THEN 'a3cad626-937a-4a4c-910c-53c1c7b6fac2'
@@ -64,7 +65,7 @@ p.[prj_lib] = '{}';
 """
 
 getFlowColumns="""
-	 SELECT 
+	 SELECT top 5
      c.clm_lib
 
     FROM
@@ -87,7 +88,7 @@ FROM
 [sn_orchestrator].[t_project_prj] p
 JOIN [sn_collect].[t_table_tbl] t ON p.prj_id = t.prj_id
 JOIN [sn_collect].[t_connection_cnn] c on c.cnn_id=t.cnn_id
-where c.cnt_id not in ('21','10','9','8','12')
+where c.cnt_id in ('12')
 )  as test
 order by test.prj_lib
 """
