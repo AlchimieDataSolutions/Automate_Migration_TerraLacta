@@ -42,7 +42,7 @@ WHERE
 
 DELETE FROM {destination}
 WHERE
-    ({keys}) NOT IN (SELECT {keys} FROM {source});
+    ({first_key}) NOT IN (SELECT {keys} FROM {source});
 """
         return delete_query
 
