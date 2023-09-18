@@ -1,12 +1,7 @@
-
 import pymssql
 
 class CDCScriptGenerator_MSSQL_Type1:
-    # def __init__(self, server, database, username, password):
-        # self.conn = pymssql.connect(server, username, password, database)
-        # self.cursor = self.conn.cursor()
-
-    def generate_insert_query(self, destination, cols, cols_source, colHash, colCreationDate, source, s, destination_alias, d, join_clause, first_key):
+    def generate_insert_query(self, destination, cols, cols_source, colHash, colCreationDate, source, s, destination_alias, join_clause, first_key):
         insert_query = f"""
 -- Data insert
 
@@ -14,9 +9,9 @@ INSERT INTO {destination} ({cols}, {colHash}, {colCreationDate})
 SELECT {cols_source}, HASHBYTES('MD5', (SELECT {cols_source} FOR XML RAW)), GETDATE()
 FROM
     {source} AS {s}
-    LEFT JOIN {destination} AS {d} ON {join_clause}
+    LEFT JOIN {destination} AS {destination_alias} ON {join_clause}
 WHERE
-    {d}.{first_key} IS NULL;
+    {destination_alias}.{first_key} IS NULL;
 """
         return insert_query
 
@@ -24,7 +19,7 @@ WHERE
         update_query = f"""
 -- Data update
 
-UPDATE {destination}
+UPDATE {destination} AS {destination_alias}
 SET
     {cols_update},
     {colHash} = HASHBYTES('MD5', (SELECT {cols_source} FOR XML RAW)),
@@ -32,11 +27,11 @@ SET
 FROM
     {source} AS {s}
 WHERE
-    {join_clause.replace("[d]", destination_alias)} AND HASHBYTES('MD5', (SELECT {cols_source} FOR XML RAW)) <> {destination_alias}.{colHash};
+    {join_clause} AND HASHBYTES('MD5', (SELECT {cols_source} FOR XML RAW)) <> {destination_alias}.{colHash};
 """
         return update_query
 
-    def generate_delete_query(self, destination, keys, source):
+    def generate_delete_query(self, destination, keys, source, first_key):
         delete_query = f"""
 -- Data delete
 
@@ -46,41 +41,28 @@ WHERE
 """
         return delete_query
 
-    def close_connection(self):
-        # self.conn.close()
-
 # usage
 if __name__ == "__main__":
-    # MSSQL CONNECTION PARAMETERS 
-    server = '10.101.5.85'
-    username = 'app_onyx_dwh_prod'
-    password = 'poca59100!!'
-    database = 'onyx_core_prod'
-
-    script_generator = CDCScriptGenerator_MSSQL_Type1()
-        # server, database, username, password)
-
-    destination = "[dbo].[nx_BUS_TEST_DVT_WEAVY_interventionequipment]"
-    cols = "sn_file_name, sn_file_rownum, srvExport, srvDateUTC, srvAttrib, interventionequipment_ID, intervention_ID, equipment_ID, addedByUser, contract_ID"
-    cols_source = "sn_file_name, sn_file_rownum, srvExport, srvDateUTC, srvAttrib, interventionequipment_ID, intervention_ID, equipment_ID, addedByUser, contract_ID"
-
+    destination = "[dbo].[nx_BUS_DVT_WEAVY_interventiontype]"
+    cols = "sn_file_name, sn_file_rownum, srvExport, srvDateUTC, srvAttrib, interventiontype_ID, label, translationKey, printTimes, printProducts, defaultDuration, isBreakFix, color, final_y_visite_prv, final_it_emaildest, final_it_enlevement"  # Corrected column list
+    cols_source = "sn_file_name, sn_file_rownum, srvExport, srvDateUTC, srvAttrib, interventiontype_ID, label, translationKey, printTimes, printProducts, defaultDuration, isBreakFix, color, final_y_visite_prv, final_it_emaildest, final_it_enlevement"  # Corrected source column list
     colHash = "hash_column"
     colCreationDate = "creation_date_column"
-    source = "[dbo].[STA_DVT_WEAVY_interventionequipment_view]"
+    source = "[dbo].[STA_DVT_WEAVY_interventiontype_json]"  # Corrected source table name
     s = "s"
     destination_alias = "d"
-    join_clause = "s.interventionequipment_ID = d.interventionequipment_ID"
-    first_key = "interventionequipment_ID"
-    cols_update = "sn_file_name = s.sn_file_name, sn_file_rownum = s.sn_file_rownum, srvExport = s.srvExport, srvDateUTC = s.srvDateUTC, srvAttrib = s.srvAttrib, intervention_ID = s.intervention_ID, equipment_ID = s.equipment_ID, addedByUser = s.addedByUser, contract_ID = s.contract_ID"
+    join_clause = "s.interventiontype_ID = d.interventiontype_ID"  # Corrected join clause based on interventiontype_ID
+    first_key = "interventiontype_ID"  # Corrected first key to interventiontype_ID
+    cols_update = "sn_file_name = s.sn_file_name, sn_file_rownum = s.sn_file_rownum, srvExport = s.srvExport, srvDateUTC = s.srvDateUTC, srvAttrib = s.srvAttrib, interventiontype_ID = s.interventiontype_ID, label = s.label, translationKey = s.translationKey, printTimes = s.printTimes, printProducts = s.printProducts, defaultDuration = s.defaultDuration, isBreakFix = s.isBreakFix, color = s.color, final_y_visite_prv = s.final_y_visite_prv, final_it_emaildest = s.final_it_emaildest, final_it_enlevement = s.final_it_enlevement"  # Corrected update column list
     keys = "sn_file_name, sn_file_rownum"
-    colUpdateDate = "update_date_column" 
+    colUpdateDate = "update_date_column"
 
-    insert_query = script_generator.generate_insert_query(destination, cols, cols_source, colHash, colCreationDate, source, s, destination_alias, destination, join_clause, first_key)  # Pass 'destination' as 'd'
+    script_generator = CDCScriptGenerator_MSSQL_Type1()
+
+    insert_query = script_generator.generate_insert_query(destination, cols, cols_source, colHash, colCreationDate, source, s, destination_alias, join_clause, first_key)  # Pass 'destination' as 'd'
     update_query = script_generator.generate_update_query(destination, cols_update, cols_source, colHash, colUpdateDate, source, s, destination_alias, join_clause)
-    delete_query = script_generator.generate_delete_query(destination, keys, source)
+    delete_query = script_generator.generate_delete_query(destination, keys, source, first_key)
 
     print(insert_query)
     print(update_query)
     print(delete_query)
-
-    script_generator.close_connection()
