@@ -1,17 +1,72 @@
-import requests
 import json
+import requests
 
-url = "https://onyx-back.azurewebsites.net/api/services/app/OWorkflows/Start"
+# Define the StartWorkFlow function
+def StartWorkFlow(domain, tenantId, workFlowId, token):
+    url = f"{domain}/api/services/app/OWorkflows/Start"
 
-payload = json.dumps({
-  "id": "07d55659-ec77-4ffb-9893-49d46a866aa1"
-})
-headers = {
-  'Abp.TenantId': '14',
-  'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJzdWIiOiIxNzUiLCJuYW1lIjoia2FzaS5nYWphdmFsbGlAYWxjaGltaWVkYXRhc29sdXRpb25zLmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6Imthc2kuZ2FqYXZhbGxpQGFsY2hpbWllZGF0YXNvbHV0aW9ucy5jb20iLCJBc3BOZXQuSWRlbnRpdHkuU2VjdXJpdHlTdGFtcCI6IkZUTlhNUFFCWVpUWTVOUVNBS0pQVU9UM0pYSllDUDZIIiwicm9sZSI6WyJBZG1pbiIsIlVzZXIiXSwiaHR0cDovL3d3dy5hc3BuZXRib2lsZXJwbGF0ZS5jb20vaWRlbnRpdHkvY2xhaW1zL3RlbmFudElkIjoiMTQiLCJqdGkiOiI1ODc4NmI2OC0zMGZhLTRjMDAtODMyMS1lMmRmYzY2NjY3YmUiLCJpYXQiOjE2OTUyODU5NDEsInRva2VuX3ZhbGlkaXR5X2tleSI6ImUxZGZiZmUwLWMyYjItNDJmYS05NmViLTNlZDE4OGViMzNlNyIsInVzZXJfaWRlbnRpZmllciI6IjE3NUAxNCIsInRva2VuX3R5cGUiOiIwIiwicmVmcmVzaF90b2tlbl92YWxpZGl0eV9rZXkiOiJiZWQ1M2JkMy0xMzg3LTRmNmUtYTk1NC0zNmY3MWExNDk4ZmQiLCJuYmYiOjE2OTUyODU5NDEsImV4cCI6MTY5NTM3MjM0MSwiaXNzIjoiT255eCIsImF1ZCI6Ik9ueXgifQ.q0CeYc5mFhByuSMXiQZWbfgY7ZEcE0883tQj6t2nLMk',
-  'Content-Type': 'application/json'
-}
+    payload = json.dumps({
+        "id": workFlowId
+    })
+    headers = {
+        'Abp.TenantId': tenantId,
+        'Accept': 'application/json',
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json'
+    }
 
-response = requests.request("POST", url, headers=headers, data=payload)
+    try:
+        response = requests.post(url, headers=headers, data=payload)
+        response_json = response.json()
 
-print(response.text)
+        if response.status_code == 200:
+            scriptId = response_json.get('result')
+            print("Workflow successfully created")
+            return scriptId
+        else:
+            raise Exception(f"StartWorkFlow failed with status code: {response.status_code}, {response_json}")
+
+    except requests.exceptions.RequestException as e:
+        raise ValueError("An error occurred in StartWorkFow:\n" + str(e))
+
+# Define the getToken function
+def getToken(domain, username, pwd, tenantId):
+    url = f"{domain}/api/TokenAuth/Authenticate"
+
+    payload = json.dumps({
+        "userNameOrEmailAddress": username,
+        "password": pwd
+    })
+    headers = {
+        'Abp.TenantId': tenantId,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+
+    try:
+        response = requests.post(url, headers=headers, data=payload)
+
+        if response.status_code == 200:
+            token = response.json().get('result').get('accessToken')
+            print("Accessed bearer token and connection successful")
+            return token
+        else:
+            raise Exception(f"Connection failed with status code: {response.status_code}, {response.json()}")
+
+    except requests.exceptions.RequestException as e:
+        raise ValueError("An error occurred in getToken:\n" + str(e))
+
+# API PARAMETERS
+api_user = "kasi.gajavalli@alchimiedatasolutions.com"
+api_password = "6nEbNvmmTbLZR9U"
+api_domain = "https://onyx-back.azurewebsites.net"
+api_tenantId = "14"
+
+# WorkFlowID
+workflowId = "07d55659-ec77-4ffb-9893-49d46a866aa1"
+
+# GetToken
+token = getToken(api_domain, api_user, api_password, api_tenantId)
+
+# StartWorkFlow
+executeWorkFlow = StartWorkFlow(api_domain, api_tenantId, workflowId, token)

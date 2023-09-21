@@ -252,6 +252,11 @@ def UpdateFlowColumn(domaine, oFlowId,  newSourceColumnName, newDestinationColum
 
           raise ValueError("An error occurred in GET TOKEN:\n" + str(e))
 
+"""
+----------------------------------------------------------------------------------------------------------------------
+CREATE PROJECT
+----------------------------------------------------------------------------------------------------------------------
+"""
 
 def createProject(domaine,projectName, organizationUnitId,tenantId, token, showConnections=True, showNotifications=False,
                   showFlows=True,showForms=False,showSchedules=True, showSQLScripts=True, showShellScripts=False,
@@ -292,6 +297,12 @@ def createProject(domaine,projectName, organizationUnitId,tenantId, token, showC
         raise ValueError("An error occurred in GET TOKEN:\n" + str(e))
 
 
+"""
+----------------------------------------------------------------------------------------------------------------------
+CREATE SQL SCRIPT
+----------------------------------------------------------------------------------------------------------------------
+"""
+
 def createSqlScript(domaine,scriptName,createSqlScriptQuery,projectId,connectionId,tenantId, token):
     url = domaine + "/api/services/app/OSQLScripts/CreateOrEdit"
 
@@ -317,3 +328,33 @@ def createSqlScript(domaine,scriptName,createSqlScriptQuery,projectId,connection
     except requests.exceptions.RequestException as e:
 
         raise ValueError("An error occurred in GET TOKEN:\n" + str(e))
+        
+"""
+----------------------------------------------------------------------------------------------------------------------
+START WORKFLOW
+----------------------------------------------------------------------------------------------------------------------
+"""        
+
+def StartWorkFlow(domaine,workFlowId,tenantId, token):
+    
+    url = domaine + "/api/services/app/OWorkflows/Start"
+
+    payload = json.dumps({
+      "id": workFlowId
+    })
+    headers = {
+        'Abp.TenantId': tenantId,
+        'Accept': 'text/plain',
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+    }
+
+    try:
+         response = requests.request("POST", url, headers=headers, data=payload)
+         scriptId = str(response.json()['result'])
+         print(f"WorkFlow successfully created")
+         return scriptId
+
+    except requests.exceptions.RequestException as e:
+
+         raise ValueError("An error occurred in StartWorkFow:\n" + str(e))
