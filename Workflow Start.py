@@ -1,0 +1,17 @@
+import requests
+import json
+
+url = "https://onyx-back.azurewebsites.net/api/services/app/OWorkflows/Start"
+
+payload = json.dumps({
+  "id": "07d55659-ec77-4ffb-9893-49d46a866aa1"
+})
+headers = {
+  'Abp.TenantId': '14',
+  'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJzdWIiOiIxNzUiLCJuYW1lIjoia2FzaS5nYWphdmFsbGlAYWxjaGltaWVkYXRhc29sdXRpb25zLmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6Imthc2kuZ2FqYXZhbGxpQGFsY2hpbWllZGF0YXNvbHV0aW9ucy5jb20iLCJBc3BOZXQuSWRlbnRpdHkuU2VjdXJpdHlTdGFtcCI6IkZUTlhNUFFCWVpUWTVOUVNBS0pQVU9UM0pYSllDUDZIIiwicm9sZSI6WyJBZG1pbiIsIlVzZXIiXSwiaHR0cDovL3d3dy5hc3BuZXRib2lsZXJwbGF0ZS5jb20vaWRlbnRpdHkvY2xhaW1zL3RlbmFudElkIjoiMTQiLCJqdGkiOiI1ODc4NmI2OC0zMGZhLTRjMDAtODMyMS1lMmRmYzY2NjY3YmUiLCJpYXQiOjE2OTUyODU5NDEsInRva2VuX3ZhbGlkaXR5X2tleSI6ImUxZGZiZmUwLWMyYjItNDJmYS05NmViLTNlZDE4OGViMzNlNyIsInVzZXJfaWRlbnRpZmllciI6IjE3NUAxNCIsInRva2VuX3R5cGUiOiIwIiwicmVmcmVzaF90b2tlbl92YWxpZGl0eV9rZXkiOiJiZWQ1M2JkMy0xMzg3LTRmNmUtYTk1NC0zNmY3MWExNDk4ZmQiLCJuYmYiOjE2OTUyODU5NDEsImV4cCI6MTY5NTM3MjM0MSwiaXNzIjoiT255eCIsImF1ZCI6Ik9ueXgifQ.q0CeYc5mFhByuSMXiQZWbfgY7ZEcE0883tQj6t2nLMk',
+  'Content-Type': 'application/json'
+}
+
+response = requests.request("POST", url, headers=headers, data=payload)
+
+print(response.text)
